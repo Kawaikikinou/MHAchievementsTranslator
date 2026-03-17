@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35818.85 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AchievementTranslator", "AchievementTranslator.csproj", "{DD7C885C-C6CF-9A20-F026-A1E35C862306}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD7C885C-C6CF-9A20-F026-A1E35C862306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD7C885C-C6CF-9A20-F026-A1E35C862306}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD7C885C-C6CF-9A20-F026-A1E35C862306}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD7C885C-C6CF-9A20-F026-A1E35C862306}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7C1D8004-DEE0-40AF-8AF5-56D6A9E34096}
+	EndGlobalSection
+EndGlobal
