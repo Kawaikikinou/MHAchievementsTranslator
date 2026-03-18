@@ -54,8 +54,8 @@ public class AchievementNodeViewModel : BaseViewModel
                     StringId != 0 && string.IsNullOrWhiteSpace(_service.GetText(StringId)),
 
                 NodeType.Achievement =>
-                    Achievement!.AllStringIds().Any(id =>
-                        string.IsNullOrWhiteSpace(_service.GetText(id))),
+                    Achievement!.AllStringIds().Any(id =>!string.IsNullOrWhiteSpace(_service.GetText(id, "en_us")) // a un texte anglais source
+                    && string.IsNullOrWhiteSpace(_service.GetText(id))),
 
                 _ => false
             };
