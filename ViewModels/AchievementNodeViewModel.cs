@@ -9,27 +9,60 @@ public class AchievementNodeViewModel : BaseViewModel
     private bool _isExpanded;
     private bool _isSelected;
 
-    public Achievement Achievement { get; }
+    public NodeType NodeType { get; }
+
+    public Achievement? Achievement { get; }
+
+    /// <summary>
+    /// Pour Category/SubCategory : le stringId du texte de catégorie.
+    /// Pour Achievement : non utilisé ici (on passe par Achievement.Name etc.).
+    /// Vaut 0 pour le nœud virtuel "(No category)".
+    /// </summary>
+    public ulong StringId { get; }
+
     public List<AchievementNodeViewModel> Children { get; } = new();
 
     public string DisplayName
     {
         get
         {
-            var name = _service.GetText(Achievement.Name, "en_us");
-            return !string.IsNullOrEmpty(name) ? name : $"[ID: {Achievement.Id}]";
+            return NodeType switch
+            {
+                NodeType.Category or NodeType.SubCategory =>
+                    StringId == 0
+                        ? "(No category)"
+                        : _service.GetText(StringId, "en_us") ?? $"[ID: {StringId}]",
+
+                NodeType.Achievement =>
+                    _service.GetText(Achievement!.Name, "en_us") ?? $"[ID: {Achievement!.Id}]",
+
+                _ => "?"
+            };
         }
     }
 
-    /// <summary>
-    /// True if the current language is missing any translation for this node's string IDs.
-    /// Also checks children recursively so parent nodes light up when a child is missing.
-    /// </summary>
-    public bool HasMissingTranslations =>
-        Achievement.AllStringIds().Any(id => string.IsNullOrWhiteSpace(_service.GetText(id)))
-        || Children.Any(c => c.HasMissingTranslations);
+    public bool IsDisabled => NodeType == NodeType.Achievement && !Achievement!.Enabled;
 
-    public bool IsDisabled => !Achievement.Enabled;
+    public bool HasMissingTranslations
+    {
+        get
+        {
+            // Propres IDs manquants
+            bool selfMissing = NodeType switch
+            {
+                NodeType.Category or NodeType.SubCategory =>
+                    StringId != 0 && string.IsNullOrWhiteSpace(_service.GetText(StringId)),
+
+                NodeType.Achievement =>
+                    Achievement!.AllStringIds().Any(id =>
+                        string.IsNullOrWhiteSpace(_service.GetText(id))),
+
+                _ => false
+            };
+
+            return selfMissing || Children.Any(c => c.HasMissingTranslations);
+        }
+    }
 
     public bool IsExpanded
     {
@@ -43,9 +76,20 @@ public class AchievementNodeViewModel : BaseViewModel
         set => Set(ref _isSelected, value);
     }
 
+    /// <summary>Constructeur pour nœuds Category / SubCategory.</summary>
+    public AchievementNodeViewModel(NodeType nodeType, ulong stringId, TranslationService service)
+    {
+        NodeType = nodeType;
+        StringId = stringId;
+        _service = service;
+    }
+
+    /// <summary>Constructeur pour nœuds Achievement.</summary>
     public AchievementNodeViewModel(Achievement achievement, TranslationService service)
     {
+        NodeType = NodeType.Achievement;
         Achievement = achievement;
+        StringId = 0;
         _service = service;
     }
 

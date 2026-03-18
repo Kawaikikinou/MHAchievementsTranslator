@@ -89,11 +89,13 @@
 
         <!-- ReadOnly TextBox -->
         <Style x:Key="TbxRO" TargetType="TextBox" BasedOn="{StaticResource TbxDark}">
-            <Setter Property="Background"  Value="#252535"/>
-            <Setter Property="Foreground"  Value="{StaticResource TextMuted}"/>
-            <Setter Property="BorderBrush" Value="#2A2A3E"/>
-            <Setter Property="IsReadOnly"  Value="True"/>
-            <Setter Property="Focusable"   Value="False"/>
+            <Setter Property="Background"      Value="#252535"/>
+            <Setter Property="Foreground"      Value="{StaticResource TextMuted}"/>
+            <Setter Property="BorderBrush"     Value="#2A2A3E"/>
+            <Setter Property="IsReadOnly"      Value="True"/>
+            <Setter Property="IsUndoEnabled"   Value="False"/>
+            <Setter Property="Focusable"       Value="False"/>
+            <Setter Property="Cursor"          Value="Arrow"/>
         </Style>
 
         <!-- ComboBox -->
@@ -326,12 +328,34 @@
                         <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                             <Grid Margin="0,1,4,1">
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Node label -->
-                                <TextBlock Grid.Column="0"
+                                <!-- Icon -->
+                                <TextBlock Grid.Column="0" Margin="0,0,5,0"
+                                           VerticalAlignment="Center" FontSize="11">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text"       Value="🏆"/>
+                                            <Setter Property="Opacity"    Value="0.6"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding NodeType}" Value="Category">
+                                                    <Setter Property="Text"    Value="📁"/>
+                                                    <Setter Property="Opacity" Value="1"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding NodeType}" Value="SubCategory">
+                                                    <Setter Property="Text"    Value="📂"/>
+                                                    <Setter Property="Opacity" Value="1"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <!-- Label -->
+                                <TextBlock Grid.Column="1"
                                            Text="{Binding DisplayName}"
                                            TextTrimming="CharacterEllipsis"
                                            VerticalAlignment="Center"
@@ -339,7 +363,15 @@
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                                            <Setter Property="FontWeight" Value="Normal"/>
                                             <Style.Triggers>
+                                                <DataTrigger Binding="{Binding NodeType}" Value="Category">
+                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                    <Setter Property="Foreground" Value="{StaticResource AccentBlue}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding NodeType}" Value="SubCategory">
+                                                    <Setter Property="Foreground" Value="{StaticResource TextMuted}"/>
+                                                </DataTrigger>
                                                 <DataTrigger Binding="{Binding HasMissingTranslations}" Value="True">
                                                     <Setter Property="Foreground" Value="{StaticResource AccentAmber}"/>
                                                 </DataTrigger>
@@ -351,8 +383,8 @@
                                     </TextBlock.Style>
                                 </TextBlock>
 
-                                <!-- Red dot indicator -->
-                                <Ellipse Grid.Column="1" Width="6" Height="6"
+                                <!-- Red dot -->
+                                <Ellipse Grid.Column="2" Width="6" Height="6"
                                          Fill="{StaticResource AccentRed}"
                                          Margin="5,0,2,0" VerticalAlignment="Center"
                                          Visibility="{Binding HasMissingTranslations, Converter={StaticResource BoolToVis}}"/>
@@ -408,13 +440,16 @@
                                    FontSize="16" FontWeight="Bold"
                                    Foreground="{StaticResource AccentBlue}"/>
                         <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                            <TextBlock FontSize="11" Foreground="{StaticResource TextFaint}">
-                                <Run Text="ID :"/>
-                                <Run Text="{Binding SelectedNode.Achievement.Id}"/>
-                                <Run Text="   |   Ordre :"/>
-                                <Run Text="{Binding SelectedNode.Achievement.DisplayOrder}"/>
-                                <Run Text="   |   Activé :"/>
-                            </TextBlock>
+                            <TextBlock FontSize="11" Foreground="{StaticResource TextFaint}"
+                                       Text="ID :"/>
+                            <TextBlock FontSize="11" Foreground="{StaticResource TextMuted}"
+                                       Text="{Binding SelectedNode.Achievement.Id}" Margin="4,0,8,0"/>
+                            <TextBlock FontSize="11" Foreground="{StaticResource TextFaint}"
+                                       Text="|   Ordre :"/>
+                            <TextBlock FontSize="11" Foreground="{StaticResource TextMuted}"
+                                       Text="{Binding SelectedNode.Achievement.DisplayOrder}" Margin="4,0,8,0"/>
+                            <TextBlock FontSize="11" Foreground="{StaticResource TextFaint}"
+                                       Text="|   Activé :"/>
                             <TextBlock FontSize="11" Margin="4,0,0,0">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
@@ -431,9 +466,8 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
-                            <TextBlock Foreground="{StaticResource TextFaint}" FontSize="11" Margin="8,0,0,0">
-                                <Run Text="   |   Cible :"/>
-                            </TextBlock>
+                            <TextBlock Foreground="{StaticResource TextFaint}" FontSize="11" Margin="8,0,0,0"
+                                       Text="|   Cible :"/>
                             <TextBlock Text="{Binding SelectedLanguage}" FontSize="11"
                                        FontWeight="SemiBold" Margin="4,0,0,0"
                                        Foreground="{StaticResource AccentGreen}"/>
@@ -522,12 +556,14 @@
 
                                         <!-- Target label + missing badge -->
                                         <DockPanel Grid.Row="3" Margin="0,0,0,4">
-                                            <TextBlock DockPanel.Dock="Left"
-                                                       FontSize="11" Foreground="{StaticResource TextFaint}">
-                                                <Run Text="🌐  "/>
-                                                <Run Text="{Binding DataContext.SelectedLanguage,
-                                                             RelativeSource={RelativeSource AncestorType=Window}}"/>
-                                            </TextBlock>
+                                            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                                                <TextBlock FontSize="11" Foreground="{StaticResource TextFaint}"
+                                                           Text="🌐  " VerticalAlignment="Center"/>
+                                                <TextBlock FontSize="11" Foreground="{StaticResource TextFaint}"
+                                                           VerticalAlignment="Center"
+                                                           Text="{Binding DataContext.SelectedLanguage,
+                                                                  RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                            </StackPanel>
                                             <Border DockPanel.Dock="Left" Background="#3D1A1F"
                                                     CornerRadius="4" Padding="6,1" Margin="8,0,0,0"
                                                     VerticalAlignment="Center"

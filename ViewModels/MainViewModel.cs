@@ -18,12 +18,10 @@ public class MainViewModel : BaseViewModel
     // Full root list (unfiltered), kept for restoring the tree view.
     private List<AchievementNodeViewModel> _allRoots = new();
 
-    // ── Observable collections ────────────────────────────────────────────
     public ObservableCollection<AchievementNodeViewModel> RootNodes { get; } = new();
     public ObservableCollection<TranslationFieldViewModel> Fields { get; } = new();
     public ObservableCollection<string> Languages { get; } = new();
 
-    // ── Selection ─────────────────────────────────────────────────────────
     private AchievementNodeViewModel? _selectedNode;
     public AchievementNodeViewModel? SelectedNode
     {
@@ -37,7 +35,6 @@ public class MainViewModel : BaseViewModel
         }
     }
 
-    // ── Language ──────────────────────────────────────────────────────────
     private string _selectedLanguage = "en_us";
     public string SelectedLanguage
     {
@@ -52,7 +49,6 @@ public class MainViewModel : BaseViewModel
         }
     }
 
-    // ── Search / filter ───────────────────────────────────────────────────
     private string _searchText = string.Empty;
     public string SearchText
     {
@@ -67,7 +63,6 @@ public class MainViewModel : BaseViewModel
         set { if (Set(ref _showOnlyUntranslated, value)) ApplyFilter(); }
     }
 
-    // ── Progress ──────────────────────────────────────────────────────────
     private string _progressText = "—";
     public string ProgressText
     {
@@ -82,7 +77,6 @@ public class MainViewModel : BaseViewModel
         private set => Set(ref _progressPercent, value);
     }
 
-    // ── Auto-save ─────────────────────────────────────────────────────────
     private bool _autoSave;
     public bool AutoSave
     {
@@ -90,22 +84,19 @@ public class MainViewModel : BaseViewModel
         set => Set(ref _autoSave, value);
     }
 
-    // ── Status bar ────────────────────────────────────────────────────────
-    private string _statusMessage = "Ready — click on 📂 to select json files.";
+    private string _statusMessage = "Prêt — cliquez sur 📂 ou placez les JSON à côté de l'exe.";
     public string StatusMessage
     {
         get => _statusMessage;
         set => Set(ref _statusMessage, value);
     }
 
-    // ── Commands ──────────────────────────────────────────────────────────
     public RelayCommand LoadFilesCommand { get; }
     public RelayCommand SaveCommand { get; }
     public RelayCommand NextUntranslatedCommand { get; }
     public RelayCommand AddLanguageCommand { get; }
     public RelayCommand ShowStatsCommand { get; }
 
-    // ─────────────────────────────────────────────────────────────────────
     public MainViewModel()
     {
         _service = new TranslationService();
@@ -120,8 +111,6 @@ public class MainViewModel : BaseViewModel
         TryAutoLoad();
     }
 
-    // ── Load ──────────────────────────────────────────────────────────────
-
     private void TryAutoLoad()
     {
         var dir = AppDomain.CurrentDomain.BaseDirectory;
@@ -135,13 +124,13 @@ public class MainViewModel : BaseViewModel
     {
         var dlg = new Microsoft.Win32.OpenFileDialog
         {
-            Title = "Select AchievementInfoMap.json",
+            Title = "Sélectionner AchievementInfoMap.json",
             Filter = "JSON files (*.json)|*.json|All files|*.*"
         };
         if (dlg.ShowDialog() != true) return;
         var infoPath = dlg.FileName;
 
-        dlg.Title = "Select AchievementStringMap.json";
+        dlg.Title = "Sélectionner AchievementStringMap.json";
         if (dlg.ShowDialog() != true) return;
 
         PerformLoad(infoPath, dlg.FileName);
@@ -155,7 +144,7 @@ public class MainViewModel : BaseViewModel
             InitializeTree();
             InitializeLanguages();
             RefreshProgress();
-            StatusMessage = $"Chargé — {_service.GetAchievements().Count} achievements.";
+            StatusMessage = $"✅ Chargé — {_service.GetAchievements().Count} achievements.";
         }
         catch (Exception ex)
         {
@@ -163,8 +152,6 @@ public class MainViewModel : BaseViewModel
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
-
-    // ── Tree ──────────────────────────────────────────────────────────────
 
     private void InitializeTree()
     {
@@ -174,8 +161,6 @@ public class MainViewModel : BaseViewModel
         _allNodes = AchievementTreeBuilder.Flatten(_allRoots);
         _flatNodes = _allNodes.ToList();
     }
-
-    // ── Languages ─────────────────────────────────────────────────────────
 
     private void InitializeLanguages()
     {
@@ -211,8 +196,6 @@ public class MainViewModel : BaseViewModel
         StatusMessage = $"✅ Langue « {input} » ajoutée — {_service.GetAchievements().Count} entrées initialisées.";
     }
 
-    // ── Fields ────────────────────────────────────────────────────────────
-
     public void ForceReloadFields() => LoadFields();
 
     private void LoadFields()
@@ -220,13 +203,26 @@ public class MainViewModel : BaseViewModel
         Fields.Clear();
         if (_selectedNode == null) return;
 
-        var a = _selectedNode.Achievement;
-        TryAddField("Nom (Name)", a.Name);
-        TryAddField("En cours (InProgressStr)", a.InProgressStr);
-        TryAddField("Complété (CompletedStr)", a.CompletedStr);
-        TryAddField("Récompense (RewardStr)", a.RewardStr);
-        TryAddField("Catégorie (CategoryStr)", a.CategoryStr);
-        TryAddField("Sous-catégorie (SubCategoryStr)", a.SubCategoryStr);
+        switch (_selectedNode.NodeType)
+        {
+            case NodeType.Category:
+                TryAddField("Catégorie", _selectedNode.StringId);
+                break;
+
+            case NodeType.SubCategory:
+                TryAddField("Sous-catégorie", _selectedNode.StringId);
+                break;
+
+            case NodeType.Achievement:
+                var a = _selectedNode.Achievement!;
+                TryAddField("Nom (Name)", a.Name);
+                TryAddField("En cours (InProgressStr)", a.InProgressStr);
+                TryAddField("Complété (CompletedStr)", a.CompletedStr);
+                TryAddField("Récompense (RewardStr)", a.RewardStr);
+                TryAddField("Catégorie (CategoryStr)", a.CategoryStr);
+                TryAddField("Sous-catégorie (SubCategoryStr)", a.SubCategoryStr);
+                break;
+        }
     }
 
     private void TryAddField(string label, ulong stringId)
@@ -262,8 +258,6 @@ public class MainViewModel : BaseViewModel
         return false;
     }
 
-    // ── Refresh ───────────────────────────────────────────────────────────
-
     private void RefreshAll()
     {
         foreach (var field in Fields) field.Refresh();
@@ -278,8 +272,6 @@ public class MainViewModel : BaseViewModel
         ProgressPercent = total == 0 ? 0 : (double)done / total * 100.0;
     }
 
-    // ── Navigation ────────────────────────────────────────────────────────
-
     private void GoToNextUntranslated()
     {
         if (_allNodes.Count == 0) return;
@@ -292,9 +284,7 @@ public class MainViewModel : BaseViewModel
         for (int i = 0; i < _allNodes.Count; i++)
         {
             var candidate = _allNodes[(start + i) % _allNodes.Count];
-            // Only leaf nodes (no children) have actual fields to translate
-            if (candidate.Achievement.AllStringIds().Any(id =>
-                string.IsNullOrWhiteSpace(_service.GetText(id))))
+            if (candidate.HasMissingTranslations && !candidate.Children.Any())
             {
                 FocusNode(candidate);
                 return;
@@ -326,23 +316,19 @@ public class MainViewModel : BaseViewModel
         return false;
     }
 
-    // ── Save ──────────────────────────────────────────────────────────────
-
     private void Save()
     {
         try
         {
             _service.Save();
-            StatusMessage = $"💾 Saved at {DateTime.Now:HH:mm:ss}  →  {_service.StringMapPath}";
+            StatusMessage = $"💾 Sauvegardé à {DateTime.Now:HH:mm:ss}  →  {_service.StringMapPath}";
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Not able to save :\n{ex.Message}", "Error",
+            MessageBox.Show($"Erreur de sauvegarde :\n{ex.Message}", "Erreur",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
-
-    // ── Stats ─────────────────────────────────────────────────────────────
 
     private void ShowStats()
     {
@@ -359,8 +345,6 @@ public class MainViewModel : BaseViewModel
         MessageBox.Show(sb.ToString(), "Statistiques par catégorie",
             MessageBoxButton.OK, MessageBoxImage.Information);
     }
-
-    // ── Filter ────────────────────────────────────────────────────────────
 
     private void ApplyFilter()
     {
@@ -380,8 +364,7 @@ public class MainViewModel : BaseViewModel
         var filtered = _allNodes.Where(n =>
         {
             bool matchSearch = !hasSearch || n.DisplayName.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
-            bool matchMiss = !filterMiss || n.Achievement.AllStringIds()
-                .Any(id => string.IsNullOrWhiteSpace(_service.GetText(id)));
+            bool matchMiss = !filterMiss || n.HasMissingTranslations;
             return matchSearch && matchMiss;
         }).ToList();
 
