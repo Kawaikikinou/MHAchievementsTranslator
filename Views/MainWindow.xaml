@@ -211,32 +211,32 @@
                 </StackPanel>
 
                 <!-- Load -->
-                <Button DockPanel.Dock="Left" Content="📂  Charger" Margin="0,0,8,0"
+                <Button DockPanel.Dock="Left" Content="📂  Load Json files" Margin="0,0,8,0"
                         Style="{StaticResource BtnGhost}" Command="{Binding LoadFilesCommand}"
                         ToolTip="Ouvrir AchievementInfoMap.json + AchievementStringMap.json"/>
 
                 <!-- Language selector -->
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
                             VerticalAlignment="Center" Margin="0,0,8,0">
-                    <TextBlock Text="Langue :" Foreground="{StaticResource TextMuted}"
-                               VerticalAlignment="Center" Margin="0,0,7,0" FontSize="13"/>
+                    <TextBlock Foreground="{StaticResource TextMuted}"
+                               VerticalAlignment="Center" Margin="0,0,7,0" FontSize="13"><Run Text="Langu"/><Run Text="age:"/></TextBlock>
                     <ComboBox Style="{StaticResource CbxDark}" Width="115"
                               ItemsSource="{Binding Languages}"
                               SelectedItem="{Binding SelectedLanguage}"/>
                 </StackPanel>
 
                 <!-- Add language -->
-                <Button DockPanel.Dock="Left" Content="＋ Langue" Margin="0,0,8,0"
+                <Button DockPanel.Dock="Left" Content="＋ Language" Margin="0,0,8,0"
                         Style="{StaticResource BtnPurple}" Command="{Binding AddLanguageCommand}"
                         ToolTip="Ajouter un nouveau code langue au fichier"/>
 
                 <!-- Save -->
-                <Button DockPanel.Dock="Left" Content="💾  Enregistrer" Margin="0,0,8,0"
+                <Button DockPanel.Dock="Left" Content="💾  Save" Margin="0,0,8,0"
                         Style="{StaticResource BtnAccent}" Command="{Binding SaveCommand}"
                         ToolTip="Ctrl+S"/>
 
                 <!-- Next untranslated -->
-                <Button DockPanel.Dock="Left" Content="⏭  Suivant non traduit"
+                <Button DockPanel.Dock="Left" Content="⏭  Next to translate"
                         Style="{StaticResource BtnGhost}"
                         Command="{Binding NextUntranslatedCommand}" ToolTip="Ctrl+Tab"/>
 
@@ -289,7 +289,7 @@
                     <Grid>
                         <TextBox x:Name="SearchBox" Style="{StaticResource TbxDark}"
                                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
-                        <TextBlock Text="🔍  Rechercher par nom anglais…"
+                        <TextBlock Text="🔍  Filter by english text…"
                                    Foreground="{StaticResource TextFaint}" FontSize="12"
                                    Margin="10,0" VerticalAlignment="Center" IsHitTestVisible="False">
                             <TextBlock.Style>
@@ -311,7 +311,7 @@
                         BorderBrush="{StaticResource BorderCol}" BorderThickness="0,0,0,1">
                     <CheckBox Style="{StaticResource ChkDark}"
                               IsChecked="{Binding ShowOnlyUntranslated}">
-                        <TextBlock Text="Afficher uniquement non traduits"
+                        <TextBlock Text="Display only not yet translated"
                                    Foreground="{StaticResource TextMuted}"/>
                     </CheckBox>
                 </Border>
@@ -421,7 +421,7 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Text="Aucun achievement sélectionné"
+                        <TextBlock Text="No achievement selected"
                                    FontSize="15" Foreground="{StaticResource TextFaint}"/>
                     </StackPanel>
                     <!-- With selection -->
@@ -489,13 +489,13 @@
                         </Style>
                     </StackPanel.Style>
                     <TextBlock Text="🎯" FontSize="52" HorizontalAlignment="Center" Margin="0,0,0,14"/>
-                    <TextBlock Text="Sélectionnez un achievement"
+                    <TextBlock Text="Select an achievement"
                                Foreground="{StaticResource TextFaint}" FontSize="16"
                                HorizontalAlignment="Center"/>
-                    <TextBlock Text="dans l'arbre à gauche pour éditer ses traductions"
+                    <TextBlock Text="in the left tree to view the translations"
                                Foreground="#45475A" FontSize="13" HorizontalAlignment="Center"
                                Margin="0,5,0,20"/>
-                    <Button Content="📂  Charger les fichiers JSON" Style="{StaticResource BtnGhost}"
+                    <Button Content="📂   Load Json files" Style="{StaticResource BtnGhost}"
                             Command="{Binding LoadFilesCommand}" HorizontalAlignment="Center"/>
                 </StackPanel>
 
@@ -608,9 +608,9 @@
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <CheckBox Style="{StaticResource ChkDark}"
                               IsChecked="{Binding AutoSave}" Margin="0,0,16,0">
-                        <TextBlock Text="Sauvegarde auto" Foreground="{StaticResource TextFaint}" FontSize="11"/>
+                        <TextBlock Text="Auto Save" Foreground="{StaticResource TextFaint}" FontSize="11"/>
                     </CheckBox>
-                    <TextBlock Text="Ctrl+S : Enregistrer   |   Ctrl+Tab : Suivant non traduit"
+                    <TextBlock Text="Ctrl+S : Save   |   Ctrl+Tab : Next to translate"
                                Foreground="{StaticResource TextFaint}" FontSize="11" VerticalAlignment="Center"/>
                 </StackPanel>
                 <TextBlock Text="{Binding StatusMessage}"
