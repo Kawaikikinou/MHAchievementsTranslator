@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:AchievementTranslator.ViewModels"
         xmlns:local="clr-namespace:AchievementTranslator.Views"
-        Title="Achievement Translation Editor"
+        Title="MHEmu Achievement Translation Editor"
         Height="820" Width="1320"
         MinHeight="600" MinWidth="920"
         Background="#1E1E2E">
@@ -18,9 +18,8 @@
         <SolidColorBrush x:Key="AccentRed"   Color="#F38BA8"/>
         <SolidColorBrush x:Key="AccentAmber" Color="#F9E2AF"/>
         <SolidColorBrush x:Key="AccentPurple" Color="#CBA6F7"/>
-        <SolidColorBrush x:Key="TextPrimary" Color="#CDD6F4"/>
+        <SolidColorBrush x:Key="TextPrimary" Color="White"/>
         <SolidColorBrush x:Key="TextMuted"   Color="#A6ADC8"/>
-        <SolidColorBrush x:Key="TextFaint"   Color="#6C7086"/>
         <SolidColorBrush x:Key="BorderCol"   Color="#45475A"/>
 
         <!-- ── Converters ── -->
@@ -99,13 +98,106 @@
         </Style>
 
         <!-- ComboBox -->
+        <!-- ComboBox -->
         <Style x:Key="CbxDark" TargetType="ComboBox">
-            <Setter Property="Background"      Value="#313145"/>
-            <Setter Property="Foreground"      Value="{StaticResource TextPrimary}"/>
-            <Setter Property="BorderBrush"     Value="{StaticResource BorderCol}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding"         Value="8,5"/>
-            <Setter Property="FontSize"        Value="13"/>
+            <Setter Property="Foreground"          Value="#CDD6F4"/>
+            <Setter Property="Background"          Value="#313145"/>
+            <Setter Property="BorderBrush"         Value="#45475A"/>
+            <Setter Property="BorderThickness"     Value="1"/>
+            <Setter Property="FontSize"            Value="13"/>
+            <Setter Property="Padding"             Value="8,5"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="#313145"/>
+                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                        <Setter Property="Padding"    Value="8,5"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter Property="Background" Value="#45475A"/>
+                                <Setter Property="Foreground" Value="#CDD6F4"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#3D3D5A"/>
+                                <Setter Property="Foreground" Value="#89B4FA"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton x:Name="ToggleButton"
+                                  Background="{TemplateBinding Background}"
+                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                  IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                  Focusable="False">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="4">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="20"/>
+                                                </Grid.ColumnDefinitions>
+                                                <!-- Flèche -->
+                                                <TextBlock Grid.Column="1" Text="▾"
+                                                   Foreground="#6C7086" FontSize="11"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+
+                            <!-- Texte de l'item sélectionné -->
+                            <ContentPresenter x:Name="ContentSite"
+                                      Content="{TemplateBinding SelectionBoxItem}"
+                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                      Margin="10,0,24,0"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Left"
+                                      IsHitTestVisible="False"
+                                      TextElement.Foreground="#CDD6F4"/>
+
+                            <!-- Liste déroulante -->
+                            <Popup x:Name="Popup"
+                           Placement="Bottom"
+                           IsOpen="{TemplateBinding IsDropDownOpen}"
+                           AllowsTransparency="True"
+                           Focusable="False"
+                           PopupAnimation="Slide">
+                                <Grid MinWidth="{TemplateBinding ActualWidth}"
+                              MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border Background="#313145"
+                                    BorderBrush="#45475A"
+                                    BorderThickness="1"
+                                    CornerRadius="4">
+                                        <ScrollViewer>
+                                            <ItemsPresenter/>
+                                        </ScrollViewer>
+                                    </Border>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ToggleButton" Property="BorderBrush" Value="#89B4FA"/>
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="ToggleButton" Property="BorderBrush" Value="#89B4FA"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!-- CheckBox -->
@@ -205,8 +297,7 @@
 
                 <!-- Title -->
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="0,0,18,0">
-                    <TextBlock Text="🎮" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <TextBlock Text="Achievement Translator" FontSize="15" FontWeight="Bold"
+                    <TextBlock Text="MHEmu Achievement Translator" FontSize="15" FontWeight="Bold"
                                Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                 </StackPanel>
 
@@ -220,7 +311,7 @@
                             VerticalAlignment="Center" Margin="0,0,8,0">
                     <TextBlock Foreground="{StaticResource TextMuted}"
                                VerticalAlignment="Center" Margin="0,0,7,0" FontSize="13"><Run Text="Langu"/><Run Text="age:"/></TextBlock>
-                    <ComboBox Style="{StaticResource CbxDark}" Width="115"
+                    <ComboBox Style="{StaticResource CbxDark}" Width="115" Height="25"
                               ItemsSource="{Binding Languages}"
                               SelectedItem="{Binding SelectedLanguage}"/>
                 </StackPanel>
@@ -290,7 +381,7 @@
                         <TextBox x:Name="SearchBox" Style="{StaticResource TbxDark}"
                                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
                         <TextBlock Text="🔍  Filter by english text…"
-                                   Foreground="{StaticResource TextFaint}" FontSize="12"
+                                   Foreground="{StaticResource TextMuted}" FontSize="12"
                                    Margin="10,0" VerticalAlignment="Center" IsHitTestVisible="False">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
@@ -375,9 +466,9 @@
                                                 <DataTrigger Binding="{Binding HasMissingTranslations}" Value="True">
                                                     <Setter Property="Foreground" Value="{StaticResource AccentAmber}"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsDisabled}" Value="True">
+                                                <!--<DataTrigger Binding="{Binding IsDisabled}" Value="True">
                                                     <Setter Property="Opacity" Value="0.40"/>
-                                                </DataTrigger>
+                                                </DataTrigger>-->
                                             </Style.Triggers>
                                         </Style>
                                     </TextBlock.Style>
@@ -422,7 +513,7 @@
                             </Style>
                         </StackPanel.Style>
                         <TextBlock Text="No achievement selected"
-                                   FontSize="15" Foreground="{StaticResource TextFaint}"/>
+                                   FontSize="15" Foreground="{StaticResource TextMuted}"/>
                     </StackPanel>
                     <!-- With selection -->
                     <StackPanel>
@@ -440,15 +531,15 @@
                                    FontSize="16" FontWeight="Bold"
                                    Foreground="{StaticResource AccentBlue}"/>
                         <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                            <TextBlock FontSize="11" Foreground="{StaticResource TextFaint}"
+                                <TextBlock FontSize="11" Foreground="{StaticResource TextMuted}"
                                        Text="ID :"/>
                             <TextBlock FontSize="11" Foreground="{StaticResource TextMuted}"
                                        Text="{Binding SelectedNode.Achievement.Id}" Margin="4,0,8,0"/>
-                            <TextBlock FontSize="11" Foreground="{StaticResource TextFaint}"
+                                <TextBlock FontSize="11" Foreground="{StaticResource TextMuted}"
                                        Text="|   Ordre :"/>
                             <TextBlock FontSize="11" Foreground="{StaticResource TextMuted}"
                                        Text="{Binding SelectedNode.Achievement.DisplayOrder}" Margin="4,0,8,0"/>
-                            <TextBlock FontSize="11" Foreground="{StaticResource TextFaint}"
+                                <TextBlock FontSize="11" Foreground="{StaticResource TextMuted}"
                                        Text="|   Activé :"/>
                             <TextBlock FontSize="11" Margin="4,0,0,0">
                                 <TextBlock.Style>
@@ -466,7 +557,7 @@
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
-                            <TextBlock Foreground="{StaticResource TextFaint}" FontSize="11" Margin="8,0,0,0"
+                                <TextBlock Foreground="{StaticResource TextMuted}" FontSize="11" Margin="8,0,0,0"
                                        Text="|   Cible :"/>
                             <TextBlock Text="{Binding SelectedLanguage}" FontSize="11"
                                        FontWeight="SemiBold" Margin="4,0,0,0"
@@ -488,12 +579,11 @@
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
-                    <TextBlock Text="🎯" FontSize="52" HorizontalAlignment="Center" Margin="0,0,0,14"/>
                     <TextBlock Text="Select an achievement"
-                               Foreground="{StaticResource TextFaint}" FontSize="16"
+                               Foreground="{StaticResource TextMuted}" FontSize="16"
                                HorizontalAlignment="Center"/>
                     <TextBlock Text="in the left tree to view the translations"
-                               Foreground="#45475A" FontSize="13" HorizontalAlignment="Center"
+                               Foreground="{StaticResource TextMuted}" FontSize="13" HorizontalAlignment="Center"
                                Margin="0,5,0,20"/>
                     <Button Content="📂   Load Json files" Style="{StaticResource BtnGhost}"
                             Command="{Binding LoadFilesCommand}" HorizontalAlignment="Center"/>
@@ -546,7 +636,7 @@
 
                                         <!-- English label -->
                                         <TextBlock Grid.Row="1" Text="🇬🇧  English (référence)"
-                                                   FontSize="11" Foreground="{StaticResource TextFaint}"
+                                                   FontSize="11" Foreground="{StaticResource TextMuted}"
                                                    Margin="0,0,0,4"/>
                                         <!-- English box -->
                                         <TextBox Grid.Row="2" Style="{StaticResource TbxRO}"
@@ -557,9 +647,9 @@
                                         <!-- Target label + missing badge -->
                                         <DockPanel Grid.Row="3" Margin="0,0,0,4">
                                             <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
-                                                <TextBlock FontSize="11" Foreground="{StaticResource TextFaint}"
+                                                <TextBlock FontSize="11" Foreground="{StaticResource TextMuted}"
                                                            Text="🌐  " VerticalAlignment="Center"/>
-                                                <TextBlock FontSize="11" Foreground="{StaticResource TextFaint}"
+                                                <TextBlock FontSize="11" Foreground="{StaticResource TextMuted}"
                                                            VerticalAlignment="Center"
                                                            Text="{Binding DataContext.SelectedLanguage,
                                                                   RelativeSource={RelativeSource AncestorType=Window}}"/>
@@ -608,10 +698,10 @@
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <CheckBox Style="{StaticResource ChkDark}"
                               IsChecked="{Binding AutoSave}" Margin="0,0,16,0">
-                        <TextBlock Text="Auto Save" Foreground="{StaticResource TextFaint}" FontSize="11"/>
+                        <TextBlock Text="Auto Save" Foreground="{StaticResource TextMuted}" FontSize="11"/>
                     </CheckBox>
                     <TextBlock Text="Ctrl+S : Save   |   Ctrl+Tab : Next to translate"
-                               Foreground="{StaticResource TextFaint}" FontSize="11" VerticalAlignment="Center"/>
+                               Foreground="{StaticResource TextMuted}" FontSize="11" VerticalAlignment="Center"/>
                 </StackPanel>
                 <TextBlock Text="{Binding StatusMessage}"
                            Foreground="{StaticResource TextMuted}" FontSize="11"

@@ -68,7 +68,7 @@ public class TranslationService
     public (int translated, int total) GetProgress()
     {
         var ids = _achievements.SelectMany(a => a.AllStringIds()).Distinct().ToHashSet();
-        int total = ids.Count;
+        int total = ids.Count(id => !string.IsNullOrWhiteSpace(_stringMap.GetText(id, "en_us")));
         int done = ids.Count(id => !string.IsNullOrWhiteSpace(_stringMap.GetText(id, CurrentLanguage)));
         return (done, total);
     }
@@ -89,6 +89,9 @@ public class TranslationService
 
             foreach (var id in a.AllStringIds())
             {
+                if (string.IsNullOrWhiteSpace(_stringMap.GetText(id, "en_us")))
+                    continue;
+
                 result[catName].all.Add(id);
                 if (!string.IsNullOrWhiteSpace(_stringMap.GetText(id, CurrentLanguage)))
                     result[catName].done.Add(id);

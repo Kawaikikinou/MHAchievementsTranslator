@@ -84,7 +84,7 @@ public class MainViewModel : BaseViewModel
         set => Set(ref _autoSave, value);
     }
 
-    private string _statusMessage = "Prêt — cliquez sur 📂 ou placez les JSON à côté de l'exe.";
+    private string _statusMessage = "Ready — clic sur 📂.";
     public string StatusMessage
     {
         get => _statusMessage;
@@ -124,13 +124,13 @@ public class MainViewModel : BaseViewModel
     {
         var dlg = new Microsoft.Win32.OpenFileDialog
         {
-            Title = "Sélectionner AchievementInfoMap.json",
+            Title = "Select AchievementInfoMap.json",
             Filter = "JSON files (*.json)|*.json|All files|*.*"
         };
         if (dlg.ShowDialog() != true) return;
         var infoPath = dlg.FileName;
 
-        dlg.Title = "Sélectionner AchievementStringMap.json";
+        dlg.Title = "Select AchievementStringMap.json";
         if (dlg.ShowDialog() != true) return;
 
         PerformLoad(infoPath, dlg.FileName);
@@ -144,11 +144,11 @@ public class MainViewModel : BaseViewModel
             InitializeTree();
             InitializeLanguages();
             RefreshProgress();
-            StatusMessage = $"✅ Chargé — {_service.GetAchievements().Count} achievements.";
+            StatusMessage = $"✅ Loaded — {_service.GetAchievements().Count} achievements.";
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Erreur de chargement :\n{ex.Message}", "Erreur",
+            MessageBox.Show($"Error during the loading :\n{ex.Message}", "Error",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
@@ -185,7 +185,7 @@ public class MainViewModel : BaseViewModel
 
         if (Languages.Contains(input))
         {
-            MessageBox.Show($"La langue « {input} » existe déjà.", "Info",
+            MessageBox.Show($"The language « {input} » already exists.", "Info",
                 MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
@@ -193,7 +193,7 @@ public class MainViewModel : BaseViewModel
         _service.AddLanguage(input);
         Languages.Add(input);
         SelectedLanguage = input;
-        StatusMessage = $"✅ Langue « {input} » ajoutée — {_service.GetAchievements().Count} entrées initialisées.";
+        StatusMessage = $"✅ The language « {input} » has been added — {_service.GetAchievements().Count} entries initialized.";
     }
 
     public void ForceReloadFields() => LoadFields();
@@ -206,21 +206,21 @@ public class MainViewModel : BaseViewModel
         switch (_selectedNode.NodeType)
         {
             case NodeType.Category:
-                TryAddField("Catégorie", _selectedNode.StringId);
+                TryAddField("Category", _selectedNode.StringId);
                 break;
 
             case NodeType.SubCategory:
-                TryAddField("Sous-catégorie", _selectedNode.StringId);
+                TryAddField("Subcategory", _selectedNode.StringId);
                 break;
 
             case NodeType.Achievement:
                 var a = _selectedNode.Achievement!;
-                TryAddField("Nom (Name)", a.Name);
-                TryAddField("En cours (InProgressStr)", a.InProgressStr);
-                TryAddField("Complété (CompletedStr)", a.CompletedStr);
-                TryAddField("Récompense (RewardStr)", a.RewardStr);
-                TryAddField("Catégorie (CategoryStr)", a.CategoryStr);
-                TryAddField("Sous-catégorie (SubCategoryStr)", a.SubCategoryStr);
+                TryAddField("Name", a.Name);
+                TryAddField("InProgressStr", a.InProgressStr);
+                TryAddField("CompletedStr", a.CompletedStr);
+                TryAddField("RewardStr", a.RewardStr);
+                TryAddField("CategoryStr", a.CategoryStr);
+                TryAddField("SubCategoryStr", a.SubCategoryStr);
                 break;
         }
     }
@@ -268,7 +268,7 @@ public class MainViewModel : BaseViewModel
     private void RefreshProgress()
     {
         var (done, total) = _service.GetProgress();
-        ProgressText = $"{done} / {total} traduits";
+        ProgressText = $"{done} / {total} translated";
         ProgressPercent = total == 0 ? 0 : (double)done / total * 100.0;
     }
 
@@ -290,7 +290,7 @@ public class MainViewModel : BaseViewModel
                 return;
             }
         }
-        StatusMessage = "🎉 Tous les achievements sont entièrement traduits !";
+        StatusMessage = "🎉 All achievements are translated !";
     }
 
     public void FocusNode(AchievementNodeViewModel target)
@@ -321,11 +321,11 @@ public class MainViewModel : BaseViewModel
         try
         {
             _service.Save();
-            StatusMessage = $"💾 Sauvegardé à {DateTime.Now:HH:mm:ss}  →  {_service.StringMapPath}";
+            StatusMessage = $"💾 Save at {DateTime.Now:HH:mm:ss}  →  {_service.StringMapPath}";
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Erreur de sauvegarde :\n{ex.Message}", "Erreur",
+            MessageBox.Show($"Save error :\n{ex.Message}", "Error",
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
@@ -334,15 +334,14 @@ public class MainViewModel : BaseViewModel
     {
         var stats = _service.GetProgressByCategory();
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine($"Langue : {SelectedLanguage}");
+        sb.AppendLine($"Language : {SelectedLanguage}");
         sb.AppendLine(new string('─', 50));
         foreach (var (cat, done, total) in stats)
         {
             double pct = total == 0 ? 100 : done * 100.0 / total;
-            var bar = new string('█', (int)(pct / 5)) + new string('░', 20 - (int)(pct / 5));
-            sb.AppendLine($"{cat,-30}  {bar}  {done,4}/{total} ({pct:0}%)");
+            sb.AppendLine($"{cat} {done}/{total} ({pct:0}%)");
         }
-        MessageBox.Show(sb.ToString(), "Statistiques par catégorie",
+        MessageBox.Show(sb.ToString(), "Statistics per category",
             MessageBoxButton.OK, MessageBoxImage.Information);
     }
 

@@ -1,7 +1,7 @@
 <Window x:Class="AchievementTranslator.Views.InputDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Ajouter une langue" Height="160" Width="380"
+        Title="Ajouter une langue" Height="200" Width="380"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="#2A2A3E">
@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0"
-                   Text="Code de la nouvelle langue (ex : fr_fr, de_de, es_es) :"
+                   Text="Code of the new language (ex : fr_fr, de_de, es_es) :"
                    Foreground="#CDD6F4" FontSize="13" TextWrapping="Wrap"/>
 
         <TextBox x:Name="InputBox" Grid.Row="2"
@@ -26,7 +26,7 @@
                  KeyDown="InputBox_KeyDown"/>
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="OkButton" Content="Ajouter" Width="90" Height="32" Margin="0,0,10,0"
+            <Button x:Name="OkButton" Content="Add" Width="90" Height="32" Margin="0,0,10,0"
                     Background="#89B4FA" Foreground="#1E1E2E" FontWeight="SemiBold"
                     BorderThickness="0" Cursor="Hand" Click="OkButton_Click">
                 <Button.Template>
@@ -38,7 +38,7 @@
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-            <Button Content="Annuler" Width="90" Height="32"
+            <Button Content="Cancel" Width="90" Height="32"
                     Background="#45475A" Foreground="#CDD6F4"
                     BorderThickness="0" Cursor="Hand" Click="CancelButton_Click">
                 <Button.Template>
